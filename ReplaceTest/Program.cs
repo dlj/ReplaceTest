@@ -15,15 +15,14 @@ namespace ReplaceTest
         // Avoid random giving back the same values.
         private static Random rand;
 
-
         static void Main(string[] args)
         {
             rand = new Random();
-            benchmark(100, 5, 2);
-            benchmark(100, 200, 20);
-            benchmark(100, 300, 50);
-            benchmark(100, 400, 75);
-            benchmark(100, 500, 100);
+            benchmark(100, 1000, 10);
+            benchmark(100, 1000, 50);
+            benchmark(100, 1000, 100);
+            benchmark(100, 1000, 250);
+            benchmark(100, 1000, 500);
             Console.ReadLine();
 
             // Note. RegEx needs to be compiled, so first iteration is super slow
@@ -77,7 +76,7 @@ namespace ReplaceTest
                 //finishedText = finishedText.Remove(m.Index + replaceOffset, m.Length).Insert(m.Index + replaceOffset, lookupDictionary[m.Value]);
                 //replaceOffset += lookupDictionary[m.Value].Length - m.Length;
 
-                finishedText += replaceText.Substring(lastIndex, m.Index - lastIndex) + lookupDictionary[m.Value]; //+ replaceText.Substring(lastIndex,m.Length);
+                finishedText += replaceText.Substring(lastIndex, m.Index - lastIndex) + lookupDictionary[m.Value];
                 lastIndex = m.Length + m.Index;
             }
             // Include the last text.
@@ -97,6 +96,7 @@ namespace ReplaceTest
             timer.Start();
             var startIndex = -1;
             var lastIndex = 0;
+            // Add one to startIndex so we move the index of indexof.
             while ((startIndex = tempText.IndexOf(startMatch, startIndex + 1, StringComparison.Ordinal)) >= 0)
             {
                 // Use the index from start match for better performance. 
@@ -110,6 +110,7 @@ namespace ReplaceTest
                 lastIndex = startIndex + token.Length;
             }
 
+            // Add missing text.
             finishedText += tempText.Substring(lastIndex);
 
             timer.Stop();
