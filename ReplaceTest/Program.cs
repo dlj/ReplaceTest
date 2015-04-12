@@ -19,7 +19,7 @@ namespace ReplaceTest
         static void Main(string[] args)
         {
             rand = new Random();
-            benchmark(100, 100, 10);
+            benchmark(100, 5, 2);
             benchmark(100, 200, 20);
             benchmark(100, 300, 50);
             benchmark(100, 400, 75);
@@ -95,9 +95,9 @@ namespace ReplaceTest
             var finishedText = "";
             var timer = new Stopwatch();
             timer.Start();
-            var startIndex = 0;
-
-            while ((startIndex = tempText.IndexOf(startMatch,0, StringComparison.Ordinal)) >= 0)
+            var startIndex = -1;
+            var lastIndex = 0;
+            while ((startIndex = tempText.IndexOf(startMatch, startIndex + 1, StringComparison.Ordinal)) >= 0)
             {
                 // Use the index from start match for better performance. 
                 var endIndex = tempText.IndexOf(endMatch, startIndex, StringComparison.Ordinal);
@@ -106,11 +106,11 @@ namespace ReplaceTest
 
                 var token = tempText.Substring(startIndex, endIndex - startIndex + 1);
 
-                finishedText += tempText.Substring(0, startIndex) + lookupDictionary[token];
-                tempText = tempText.Remove(0, endIndex + 1);
+                finishedText += tempText.Substring(lastIndex, startIndex - lastIndex) + lookupDictionary[token];
+                lastIndex = startIndex + token.Length;
             }
 
-            finishedText += tempText;
+            finishedText += tempText.Substring(lastIndex);
 
             timer.Stop();
             Debug.Assert(originalText.Equals(finishedText));
@@ -131,7 +131,7 @@ namespace ReplaceTest
             for (int i = 0; i < replaceTextSplit.Length; i++)
             {
                 startIndex = replaceTextSplit[i].IndexOf(endMatch,0, StringComparison.Ordinal);
-                // If a index has no matches, just add the result and skip the iteration
+                // If an index has no matches, just add the result and skip the iteration
                 if (startIndex < 0)
                 {
                     finishedText += replaceTextSplit[i];
